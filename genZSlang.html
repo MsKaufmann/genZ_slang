@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenZ-er 95 - Slang Translator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --win-gray: #c0c0c0;
+            --win-white: #ffffff;
+            --win-dark-gray: #808080;
+            --win-black: #000000;
+            --win-blue: #000080;
+            --win-blue-light: #1084d0;
+        }
+
+        body {
+            background-color: #008080; /* Classic Retro Teal */
+            font-family: "MS Sans Serif", "Arial", sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            cursor: default;
+        }
+
+        .beveled-outset {
+            border: 2px solid;
+            border-color: var(--win-white) var(--win-dark-gray) var(--win-dark-gray) var(--win-white);
+        }
+
+        .beveled-inset {
+            border: 2px solid;
+            border-color: var(--win-dark-gray) var(--win-white) var(--win-white) var(--win-dark-gray);
+        }
+
+        .window {
+            background-color: var(--win-gray);
+            box-shadow: 2px 2px 0 var(--win-black);
+            max-width: 95%;
+            width: 580px;
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, var(--win-blue), var(--win-blue-light));
+            padding: 3px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .win-btn {
+            width: 16px;
+            height: 14px;
+            background-color: var(--win-gray);
+            border: 1px solid;
+            border-color: var(--win-white) var(--win-dark-gray) var(--win-dark-gray) var(--win-white);
+            font-size: 10px;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            cursor: pointer;
+        }
+
+        .win-btn:active {
+            border-color: var(--win-dark-gray) var(--win-white) var(--win-white) var(--win-dark-gray);
+            padding-top: 1px;
+            padding-left: 1px;
+        }
+
+        .menu-bar {
+            padding: 2px 5px;
+            font-size: 12px;
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--win-dark-gray);
+        }
+
+        .address-bar {
+            padding: 5px;
+            background-color: var(--win-gray);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+        }
+
+        .browser-content {
+            background-color: white;
+            height: 380px;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        input[type="text"] {
+            font-family: monospace;
+            padding: 4px;
+            outline: none;
+            width: 100%;
+        }
+
+        .start-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background-color: var(--win-gray);
+            border-top: 2px solid var(--win-white);
+            display: flex;
+            align-items: center;
+            padding: 2px;
+            z-index: 50;
+        }
+
+        .start-button {
+            height: 24px;
+            padding: 0 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .clock {
+            margin-left: auto;
+            border-left: 1px solid var(--win-dark-gray);
+            padding: 0 10px;
+            font-size: 12px;
+        }
+
+        .result-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border-left: 4px solid var(--win-blue);
+            position: relative;
+        }
+
+        .option-tag {
+            position: absolute;
+            right: 8px;
+            top: 4px;
+            font-size: 9px;
+            color: #808080;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        ::-webkit-scrollbar { width: 16px; }
+        ::-webkit-scrollbar-track { background: var(--win-gray); box-shadow: inset 1px 1px 0 var(--win-white); }
+        ::-webkit-scrollbar-thumb { background: var(--win-gray); border: 2px solid; border-color: var(--win-white) var(--win-dark-gray) var(--win-dark-gray) var(--win-white); }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center">
+
+    <div class="window beveled-outset flex flex-col animate-in fade-in zoom-in duration-300">
+        <div class="title-bar">
+            <div class="flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <span>GenZ-to-English Explorer 1.0</span>
+            </div>
+            <div class="flex gap-1">
+                <button class="win-btn">_</button>
+                <button class="win-btn">□</button>
+                <button class="win-btn" onclick="location.reload()">X</button>
+            </div>
+        </div>
+
+        <div class="menu-bar">
+            <span class="cursor-pointer hover:bg-blue-900 hover:text-white px-1"><u>F</u>ile</span>
+            <span class="cursor-pointer hover:bg-blue-900 hover:text-white px-1"><u>E</u>dit</span>
+            <span class="cursor-pointer hover:bg-blue-900 hover:text-white px-1"><u>V</u>iew</span>
+            <span class="cursor-pointer hover:bg-blue-900 hover:text-white px-1"><u>G</u>o</span>
+            <span class="cursor-pointer hover:bg-blue-900 hover:text-white px-1"><u>H</u>elp</span>
+        </div>
+
+        <div class="address-bar border-b border-gray-500">
+            <span class="text-gray-600">Address:</span>
+            <div class="beveled-inset bg-white flex-grow flex items-center px-1">
+                <span class="text-blue-600 mr-1 text-xs">slang://</span>
+                <input type="text" id="searchInput" placeholder="Type slang here..." class="border-none text-sm py-1">
+            </div>
+            <button id="searchBtn" class="beveled-outset px-4 py-1 bg-gray-300 hover:bg-gray-200 text-sm active:inset">Search</button>
+        </div>
+
+        <div class="browser-content beveled-inset" id="displayArea">
+            <div id="welcomeScreen" class="text-center mt-10">
+                <h1 class="text-2xl font-bold mb-2">Welcome to GenZ-er 95</h1>
+                <p class="text-xs text-gray-500 mb-8">Decoding the youth in plain English.</p>
+                <div class="p-4 border-2 border-gray-300 inline-block bg-gray-50 beveled-inset">
+                    <p class="text-[10px] uppercase text-gray-400 font-bold mb-3">Common Lookups</p>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button onclick="quickSearch('rizz')" class="text-blue-700 underline text-xs">rizz</button>
+                        <button onclick="quickSearch('cap')" class="text-blue-700 underline text-xs">cap</button>
+                        <button onclick="quickSearch('tea')" class="text-blue-700 underline text-xs">tea</button>
+                        <button onclick="quickSearch('slay')" class="text-blue-700 underline text-xs">slay</button>
+                        <button onclick="quickSearch('glow up')" class="text-blue-700 underline text-xs">glow up</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loader" class="loader">
+                <p id="loaderText" class="text-[11px] mb-2 font-bold">Consulting AI Brain...</p>
+                <div class="w-full bg-gray-200 h-4 beveled-inset p-0.5">
+                    <div id="progressBar" class="bg-blue-900 h-full w-0 transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <div id="results" class="hidden">
+                <div class="border-b-2 border-blue-900 mb-4 pb-1 flex justify-between items-end">
+                    <div>
+                        <span class="text-[10px] text-gray-500 uppercase font-bold">Search Result for:</span>
+                        <h2 id="resultTerm" class="text-2xl font-serif italic text-gray-900 capitalize">Term</h2>
+                    </div>
+                    <span id="matchType" class="text-[9px] font-bold px-1 bg-gray-200 border border-gray-400 mb-1 uppercase">LOCAL</span>
+                </div>
+                <div id="definitionsContainer"></div>
+                <div id="sourceNote" class="mt-6 text-[10px] text-gray-400 border-t pt-2 italic"></div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center px-2 py-1 bg-gray-300 text-[10px] text-gray-600 border-t border-gray-400">
+            <span id="statusText">Ready</span>
+            <span id="processorNote">Idle</span>
+        </div>
+    </div>
+
+    <div class="start-bar">
+        <button class="start-button beveled-outset bg-gray-300 mr-2">
+            <span class="text-blue-800 text-lg">田</span>
+            <span class="font-bold">Start</span>
+        </button>
+        <div class="beveled-inset px-3 py-0.5 bg-gray-200 text-xs font-bold border-r border-gray-400">GenZ-er 95</div>
+        <div class="clock beveled-inset bg-gray-300" id="clock">12:00 PM</div>
+    </div>
+
+    <script>
+        /**
+         * VS CODE SETUP:
+         * Paste your Gemini API key between the quotes below.
+         */
+        const apiKey = "";
+        const urbanDictApiKey = "df40d32f9fmsh39318deba5613c7p1d85d9jsn3ce6b3588a91";
+
+        const localSlang = {
+            "rizz": ["Natural charisma or charm, especially when flirting.", "The ability to attract a romantic interest easily."],
+            "cap": ["To lie or tell a falsehood.", "Used to call out someone who is not being truthful."],
+            "no cap": ["Used to emphasize that one is being completely honest.", "Seriously; I'm not lying."],
+            "bussin": ["Something that tastes excellent (usually food).", "Very high quality or impressive."],
+            "mid": ["Average, mediocre, or underwhelming.", "Something that is just 'okay' but nothing special."],
+            "bet": ["An expression of agreement or confirmation.", "Equivalent to saying 'Alright' or 'I'm down'."],
+            "sus": ["Short for suspicious or suspect.", "Describes someone or something that seems shady or untrustworthy."],
+            "slay": ["To do something exceptionally well.", "To look very impressive or successful."],
+            "tea": ["Gossip or personal news about someone.", "The inside scoop on a dramatic situation."],
+            "ghosting": ["Suddenly cutting off all communication without explanation.", "Ignoring someone you were previously dating or talking to."],
+            "clout": ["Influence, fame, or social media popularity.", "Social status or power."],
+            "flex": ["To show off one's wealth, success, or possessions.", "Boasting about an achievement."],
+            "lowkey": ["Subtly, secretly, or without making a big deal.", "Slightly or somewhat."],
+            "highkey": ["Openly, intensely, or very obviously.", "Definitely or very clearly."],
+            "shook": ["To be deeply shocked, surprised, or upset.", "Visibly shaken by news."],
+            "simp": ["Someone who goes to extremes to please a crush.", "Being overly desperate for someone's attention."],
+            "yeet": ["To throw something with great force.", "An exclamation of excitement when throwing something away."],
+            "thirst trap": ["A photo posted specifically to get attention or compliments.", "Sexy pictures shared for 'likes'."],
+            "situationship": ["A romantic relationship that is not yet officially defined.", "More than friends, but not a committed couple."],
+            "delulu": ["Short for delusional; having unrealistic expectations.", "Imagining a romantic situation that isn't real."],
+            "sigma": ["An independent, self-reliant person who doesn't follow social norms.", "A 'lone wolf' who is successful but keeps to themselves."],
+            "aura": ["The overall vibe or presence a person gives off.", "Someone's coolness level or energy."],
+            "npc": ["Short for 'Non-Player Character'; someone who doesn't think for themselves.", "A person who just follows trends and has no original personality."],
+            "ate": ["They did a fantastic job.", "They performed exceptionally well."],
+            "side eye": ["A look of judgment, suspicion, or disapproval.", "Looking at someone 'out of the corner of your eye' in doubt."],
+            "roman empire": ["A topic or thought that someone thinks about constantly.", "A recurring obsession."],
+            "it’s giving": ["It reminds me of... or it has the vibe of...", "Used to describe the style or mood of something."],
+            "touch grass": ["A way to tell someone to go outside and get away from the internet.", "A reminder to be more realistic."],
+            "rent free": ["Thinking about someone or something all the time.", "When something bothers you so much you can't stop thinking about it."],
+            "slaps": ["Describes something very high quality, usually music.", "Excellent or impressive."],
+            "stan": ["To be an extremely dedicated or obsessed fan.", "Supporting a person or celebrity very intensely."],
+            "glow up": ["A major positive transformation in appearance or life status.", "Improving oneself significantly over time."],
+            "gucci": ["Everything is fine, good, or okay.", "A way to say 'we're good'."],
+            "cancelled": ["When a person is publicly shamed and rejected for offensive behavior.", "Being boycotted by social media users."],
+            "periodt": ["Used at the end of a sentence to signal that the point is final.", "End of discussion."],
+            "main character": ["Someone who acts as if the whole world revolves around them.", "Having high confidence and a sense of destiny."],
+            "soft launch": ["Subtly hinting at a new partner on social media without showing their face.", "Teasing a relationship before it's official."],
+            "hard launch": ["Officially announcing a relationship with a clear photo.", "Revealing a partner to everyone at once."],
+            "sneaky link": ["A person someone meets with secretly for a romantic encounter.", "A secret hookup."],
+            "fanum tax": ["When someone takes a small part of your food without asking.", "Stealing snacks from friends."],
+            "gyatt": ["An exclamation used when seeing someone very attractive.", "A sound of surprise at someone's physical appearance."],
+            "skibidi": ["A nonsense word from a viral video series, used as a filler.", "A word with no real meaning used by children."],
+            "dead": ["Used to indicate that something was extremely funny.", "I am laughing so hard I am speechless."],
+            "finna": ["Short for 'fixing to'; I am about to do something.", "Getting ready to."],
+            "valid": ["Something that is acceptable, understandable, or logical.", "That's a fair point."],
+            "bruh": ["An expression of disbelief, annoyance, or confusion.", "Equivalent to 'Are you serious?'"],
+            "sending me": ["Something that is so funny it makes you lose control.", "I'm laughing a lot at this."],
+            "it's the ... for me": ["Focusing on a specific detail that is either funny or annoying.", "Highlighting a particular feature of a situation."]
+        };
+
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const loader = document.getElementById('loader');
+        const progressBar = document.getElementById('progressBar');
+        const results = document.getElementById('results');
+        const statusText = document.getElementById('statusText');
+        const processorNote = document.getElementById('processorNote');
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+        setInterval(updateClock, 1000); updateClock();
+
+        function quickSearch(t) { searchInput.value = t; performSearch(); }
+
+        async function fetchFromUrbanDictionary(term) {
+            const response = await fetch(`https://urban-dictionary7.p.rapidapi.com/v0/define?term=${encodeURIComponent(term)}`, {
+                headers: {
+                    'X-RapidAPI-Key': urbanDictApiKey,
+                    'X-RapidAPI-Host': 'urban-dictionary7.p.rapidapi.com'
+                }
+            });
+            if (!response.ok) throw new Error(`URBAN_FAIL_${response.status}`);
+            const data = await response.json();
+            if (!data.list || data.list.length === 0) return null;
+
+            const top = data.list.sort((a, b) => b.thumbs_up - a.thumbs_up)[0];
+
+            return [top.definition.replace(/\[([^\]]+)\]/g, '$1').trim()];
+        }
+
+        // Gemini AI call - used for search terms not in local database
+        async function fetchFromGemini(prompt, systemPrompt = "") {
+            if (!apiKey || apiKey === "PASTE_YOUR_API_KEY_HERE") {
+                throw new Error("NO_API_KEY");
+            }
+            
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: systemPrompt ? { parts: [{ text: systemPrompt }] } : undefined,
+                generationConfig: { responseMimeType: "application/json" }
+            };
+
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) throw new Error(`GEMINI_FAIL_${response.status}`);
+            const data = await response.json();
+            let text = data.candidates?.[0]?.content?.parts?.[0]?.text || "[]";
+            return JSON.parse(text.replace(/```json/g, "").replace(/```/g, "").trim());
+        }
+
+        async function performSearch() {
+            const term = searchInput.value.trim().toLowerCase();
+            if (!term) return;
+
+            document.getElementById('welcomeScreen').style.display = 'none';
+            results.classList.add('hidden');
+            loader.style.display = 'block';
+            statusText.textContent = "Processing...";
+            processorNote.textContent = "Scanning Brainframe...";
+
+            let p = 0;
+            const iv = setInterval(() => { p += 8; if(p<90) progressBar.style.width = p+'%'; }, 100);
+
+            try {
+                let plainDefs = [];
+                let source = "Local Slang Database";
+                let matchType = "LOCAL";
+
+                if (localSlang[term]) {
+                    plainDefs = localSlang[term];
+                } else {
+                    statusText.textContent = "Checking Urban Dictionary...";
+                    processorNote.textContent = "Fetching from the streets...";
+
+                    try {
+                        const urbanDefs = await fetchFromUrbanDictionary(term);
+                        if (urbanDefs && urbanDefs.length > 0) {
+                            plainDefs = urbanDefs;
+                            matchType = "URBAN DICT";
+                            source = "Urban Dictionary";
+                        }
+                    } catch (urbanErr) {
+                        console.warn("Urban Dictionary lookup failed:", urbanErr);
+                    }
+
+                    if (plainDefs.length === 0) {
+                        statusText.textContent = "Consulting AI...";
+                        processorNote.textContent = "Generating Definition...";
+                        matchType = "AI BRAIN";
+
+                        plainDefs = await fetchFromGemini(
+                            `Define the Gen Z slang term "${term}" for a 40-year-old adult. Use plain, simple English that an Israeli adult would understand. Provide exactly 2 different ways it's used or explained.`,
+                            "You are a professional Slang Translator for 40-year-old adults. Translate Gen Z slang into 2-3 distinct, plain English one-liner definitions. No 90s slang. Return ONLY a valid JSON array of strings."
+                        );
+                        source = "Gemini LLM Knowledge";
+                    }
+                }
+
+                clearInterval(iv);
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    results.classList.remove('hidden');
+                    document.getElementById('resultTerm').textContent = term;
+                    const matchEl = document.getElementById('matchType');
+                    matchEl.textContent = matchType;
+                    matchEl.style.background = matchType === 'URBAN DICT' ? '#e6f0ff' : '';
+                    matchEl.style.borderColor = matchType === 'URBAN DICT' ? '#4a90d9' : '';
+                    matchEl.style.color = matchType === 'URBAN DICT' ? '#003080' : '';
+                    
+                    const container = document.getElementById('definitionsContainer');
+                    container.innerHTML = '';
+                    
+                    plainDefs.forEach((def, i) => {
+                        const div = document.createElement('div');
+                        div.className = "result-item animate-in slide-in-from-left duration-300";
+                        div.innerHTML = `<span class="option-tag">Option #${i+1}</span>${def}`;
+                        container.appendChild(div);
+                    });
+
+                    document.getElementById('sourceNote').textContent = `Source: ${source}`;
+                    statusText.textContent = "Ready";
+                    processorNote.textContent = "AI Processor Active";
+                }, 400);
+
+            } catch (err) {
+                console.error("Critical Search Failure:", err);
+                clearInterval(iv);
+                loader.style.display = 'none';
+                results.classList.remove('hidden');
+                document.getElementById('resultTerm').textContent = "Search Error";
+                document.getElementById('matchType').textContent = "ERROR";
+                
+                let friendlyMsg = "The AI Brain failed to respond.";
+                if (err.message === "NO_API_KEY") {
+                    friendlyMsg = "API Key is missing in the code.";
+                }
+
+                document.getElementById('definitionsContainer').innerHTML = `
+                    <p class="text-xs p-2 text-red-600 font-bold">${friendlyMsg}</p>
+                    <p class="text-[10px] p-2 text-gray-500">To fix this, open this file in VS Code and paste your Gemini API Key on line 588.</p>
+                `;
+                statusText.textContent = "Search Failed";
+                processorNote.textContent = "Check API Key";
+            }
+        }
+
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') performSearch(); });
+    </script>
+</body>
+</html>
