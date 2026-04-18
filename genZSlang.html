@@ -332,9 +332,9 @@
             const data = await response.json();
             if (!data.list || data.list.length === 0) return null;
 
-            const top = data.list.sort((a, b) => b.thumbs_up - a.thumbs_up)[0];
-
-            return [top.definition.replace(/\[([^\]]+)\]/g, '$1').trim()];
+            return data.list
+                .sort((a, b) => b.thumbs_up - a.thumbs_up)
+                .map(entry => entry.definition.replace(/\[([^\]]+)\]/g, '$1').trim());
         }
 
         // Gemini AI call - used for search terms not in local database
@@ -424,13 +424,30 @@
                     
                     const container = document.getElementById('definitionsContainer');
                     container.innerHTML = '';
-                    
-                    plainDefs.forEach((def, i) => {
+
+                    const isUrban = matchType === 'URBAN DICT';
+                    const visibleDefs = isUrban ? plainDefs.slice(0, 3) : plainDefs;
+                    const hiddenDefs = isUrban ? plainDefs.slice(3) : [];
+
+                    function renderDef(def, i) {
                         const div = document.createElement('div');
                         div.className = "result-item animate-in slide-in-from-left duration-300";
                         div.innerHTML = `<span class="option-tag">Option #${i+1}</span>${def}`;
-                        container.appendChild(div);
-                    });
+                        return div;
+                    }
+
+                    visibleDefs.forEach((def, i) => container.appendChild(renderDef(def, i)));
+
+                    if (hiddenDefs.length > 0) {
+                        const seeMoreBtn = document.createElement('button');
+                        seeMoreBtn.className = "beveled-outset px-3 py-1 bg-gray-300 text-xs font-bold mt-1 mb-2 w-full";
+                        seeMoreBtn.textContent = `▼ See More (${hiddenDefs.length} more)`;
+                        seeMoreBtn.onclick = () => {
+                            seeMoreBtn.remove();
+                            hiddenDefs.forEach((def, i) => container.appendChild(renderDef(def, visibleDefs.length + i)));
+                        };
+                        container.appendChild(seeMoreBtn);
+                    }
 
                     document.getElementById('sourceNote').textContent = `Source: ${source}`;
                     statusText.textContent = "Ready";
